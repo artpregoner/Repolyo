@@ -1,1 +1,212 @@
-"hellow world" 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSIT 4102</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: black;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        .container {
+            text-align: center;
+            animation: glitch 1.5s infinite;
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            font-size: 4em;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
+
+        p {
+            font-size: 1.5em;
+            margin: 10px 0;
+            letter-spacing: 2px;
+        }
+
+        @keyframes glitch {
+            0% {
+                text-shadow: 2px 2px 0 #ff0000, -2px -2px 0 #0000ff;
+                transform: translate(0);
+            }
+            25% {
+                text-shadow: -2px -2px 0 #00ffff, 2px 2px 0 #ffff00;
+                transform: translate(-2px, 2px);
+            }
+            50% {
+                text-shadow: 2px 2px 0 #00ff00, -2px -2px 0 #ff00ff;
+                transform: translate(2px, -2px);
+            }
+            75% {
+                text-shadow: -2px -2px 0 #800080, 2px 2px 0 #ffa500;
+                transform: translate(-1px, 1px);
+            }
+            100% {
+                text-shadow: 2px 2px 0 #ff0000, -2px -2px 0 #0000ff;
+                transform: translate(0);
+            }
+        }
+
+        .glitch-line {
+            background: lime;
+            width: 100vw;
+            height: 2px;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            animation: glitch-line 1s infinite;
+            z-index: 1;
+        }
+
+        @keyframes glitch-line {
+            0%, 100% {
+                transform: translateY(-50%) scaleX(0);
+                opacity: 0;
+            }
+            50% {
+                transform: translateY(-50%) scaleX(1);
+                opacity: 0.5;
+            }
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .scanline {
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(
+                0deg,
+                rgba(0, 255, 0, 0) 0%,
+                rgba(0, 255, 0, 0.1) 10%,
+                rgba(0, 255, 0, 0) 100%
+            );
+            position: fixed;
+            top: 0;
+            left: 0;
+            animation: scan 6s linear infinite;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% {
+                transform: translateY(-100%);
+            }
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+
+        .start-button {
+            background: transparent;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 10px 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .start-button:hover {
+            background: #00ff0033;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    <canvas class="matrix-bg" id="matrix"></canvas>
+    <div class="container">
+        <h1>8-700</h1>
+        <p>JOLLIBEE</p>
+        <p>DELIVERY</p>
+        <button class="start-button" onclick="toggleAudio()">START SYSTEM</button>
+    </div>
+    <div class="glitch-line">BAYAG</div>
+
+    <iframe id="ytplayer" type="text/html" width="0" height="0"
+    src="https://www.youtube.com/watch?v=_ADjTLPINso"
+    frameborder="0" allow="autoplay">
+</iframe>
+
+    <script>
+
+        const canvas = document.querySelector('.matrix-bg');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        let isPlaying = false;
+
+        function toggleAudio() {
+            const iframe = document.getElementById('ytplayer');
+            if (isPlaying) {
+                iframe.src = ""; // Stop the audio
+            } else {
+                iframe.src = "https://www.youtube.com/watch?v=_ADjTLPINso";
+            }
+            isPlaying = !isPlaying;
+        }
+    </script>
+</body>
+</html>
